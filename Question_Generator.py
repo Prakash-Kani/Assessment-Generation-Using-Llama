@@ -21,18 +21,13 @@ embeddings = HuggingFaceEmbeddings(model_name=embeddings_model_name)
 store = {}
 
 def History_Chain(retriever):
-    # contextualize_q_system_prompt = (
-                                    #     "Given a chat history and the latest user question "
-                                    #     "which might reference context in the chat history, "
-                                    #     "formulate a standalone question which can be understood "
-                                    #     "without the chat history. Do NOT answer the question, "
-                                    #     "just reformulate it if needed and otherwise return it as is."
-                                    # )
     contextualize_q_system_prompt = (
-    "Given a chat history and the latest user request, which involves generating a new problem-solving beginner level programming question, "
-    "formulate a question that is unique and not a repetition of previously generated questions. Ensure the new question "
-    "is relevant to the ongoing conversation and problem-solving beginner level programming context. Do NOT repeat previous questions, and return the new question."
-    )
+                                        "Given the chat history and the latest user input, which involves generating a programming or conceptual or theoritical or pseude-code or "
+                                        "code completion or  syntax completion question at a specific difficulty level (beginner, intermediate, or advanced) or based on a specific topic, "
+                                        "formulate a unique question as requested. Ensure the question is not a repetition of previously generated questions, "
+                                        "is relevant to the user's input, and adheres to the specified difficulty level and topic, if provided. "
+                                        "Return only the question, without the answer."
+                                    )
 
 
     contextualize_q_prompt = ChatPromptTemplate.from_messages(
@@ -51,27 +46,15 @@ def History_Chain(retriever):
 
 def Question_Answer_Chain():
 
-
-    # system_prompt = (
-    #     "You are an assistant for question-answering tasks. "
-    #     "Use the following pieces of retrieved context to answer "
-    #     "the question. If you don't know the answer, say that you "
-    #     "don't know. Use three sentences maximum and keep the "
-    #     "answer concise."
-    #     "If the context does not contain the answer, respond with 'The information is not available in the provided context.'"
-    #     # "The user is greeting you. Respond appropriately as a friendly assistant."
-    #     "\n\n"
-    #     "{context}"
-    # )   
-
     system_prompt = (
-    "You are an assistant that generates unique problem-solving beginner level programming questions based on the context provided. "
-    "Using the retrieved pieces of chat history and the user's latest input, create a fresh and non-repetitive question "
-    "that challenges the user in problem-solving beginner level programming. Ensure that no question from the previous history is repeated."
-    "If you cannot generate a unique question based on the history, state 'A unique question cannot be generated from the given context.'"
-    "\n\n"
-    "{context}"
-)
+                        "You are an assistant tasked with generating unique questions based on user input. "
+                        "When the user requests a programming or descriptive question at a specific difficulty level or from a specific topic, "
+                        "generate a new question that matches the requested criteria (beginner, intermediate, advanced, programming, or conceptual or theoritical or pseude-code or code completion or  syntax completion). "
+                        "Do not provide an answer. If the user asks for an answer, respond with 'I don't know.' "
+                        "If the context does not contain the information to generate the question, respond with 'A question cannot be generated from the given context.' "
+                        "\n\n"
+                        "{context}"
+                    )
 
     qa_prompt = ChatPromptTemplate.from_messages(
                                                     [
@@ -92,8 +75,6 @@ def RAG_Chain(retriever):
 def get_session_history(session_id: str) -> BaseChatMessageHistory:
     if session_id not in store:
         store[session_id] = ChatMessageHistory()
-        # store[session_id].add_user_message("What is the title of the given context?")
-        # store[session_id].add_ai_message("Let's dive into chemical bonding and molecular structure. What specific topic or question can I help you with today?")
     return store[session_id]
 
 def Conversational_Chain(filename):
